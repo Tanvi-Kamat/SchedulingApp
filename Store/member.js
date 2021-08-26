@@ -17,20 +17,20 @@ function actionAdd (name, color) {
     }
 }
 // used to delete member's id
-function actionDelete (id) {
+function actionDelete (memberId) {
     return {
         type: deleteAction.type,
         payload: {
-            id: id,
+            id: memberId,
         }
     }
 }
 // used to update the members
-function actionUpdate (id, changeset) {
+function actionUpdate (memberId, changeset) {
     return {
         type: updateAction,
         payload: {
-            id: id,
+            id: memberId,
             changeset: changeset.type,
         }
     }

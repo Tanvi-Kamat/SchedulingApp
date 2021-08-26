@@ -5,8 +5,8 @@ const addDevice = createAction('device/add')
 const deleteDevice = createAction('device/delete')
 const updateDevice = createAction('device/update')
 const deleteEvent = createAction('member/deleteevent')
-
 const addCal = createAction('calendar/add')
+
 // adds device's name and icon
 function deviceAdd(name, icon) {
     return {
@@ -18,44 +18,45 @@ function deviceAdd(name, icon) {
     }
 }
 // deletes device using its id
-function deviceDelete(id) {
+function deviceDelete(deviceID) {
     return {
         type: deleteDevice.type,
         payload: {
-            id: id,
+            id: deviceID,
         }
     }
 }
 // updates device using its id
-function deviceUpdate(id, changeset) {
+function deviceUpdate(deviceID, changeset) {
     return {
         type: updateDevice.type,
         payload: {
-            id: id,
+            id: deviceID,
             changeset: changeset,
         }
     }
 }
 // deletes device's event using id, day and index 
-function eventDelete(id, day, index) {
+function eventDelete(deviceID, day, index) {
     return {
         type: deleteEvent.type,
         payload: {
-            id: id,
+            id: deviceID,
             day: day,
             index: index,
         }
     }
 }
 // adds an event to the calendar using the id, day, start hour/min and duration
-function calAdd(id, day, startHour, startMin, duration) {
+function calAdd(memberID, deviceID, day, startHour, startMin, duration) {
     return {
         type: addCal.type,
         payload: {
-            id: id,
+            memberId: memberID,
+            deviceId: deviceID,
             day: day,
             startHour: startHour,
-            startMin: startMin,
+            startMinute: startMin,
             duration: duration,
         }
     }
@@ -95,13 +96,14 @@ const deviceReducer = createReducer(DeviceState, (builder) => {
         })
         // adds event by updating data and creating new event with all features
         .addCase(addCal, (state, action) => {
-            let deviceId =  action.payload.id
+            let memberId = action.payload.memberId;
+            let deviceId =  action.payload.deviceId
             let day = action.payload.day;
             let startHour = action.payload.startHour;
             let startMinute = action.payload.startMinute;
             let duration = action.payload.duration;
             
-            Scheduling.calendar.createEvent(member, state.devices[deviceId], day, startHour, startMinute, duration);
+            Scheduling.calendar.createEvent(memberId, state.devices[deviceId], day, startHour, startMinute, duration);
         })
 })
 // Renaming the actions (like a dictionary) so that it has the payload (the changes themselves) when we export the functions that make the payloads

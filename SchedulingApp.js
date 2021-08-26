@@ -25,7 +25,7 @@ function createDevice(id, name, icon) {
     return { id: id,
     name: name,
     icon: icon,
-    calendar: {0: [], 1:[], 2:[], 3: [], 4: [], 5: [], 6: [], 7: [], },
+    calendar: {0: [], 1:[], 2:[], 3: [], 4: [], 5: [], 6: []},
     }
 }
 // a class to get device's id, takes device, returns id
@@ -49,6 +49,9 @@ function getDeviceCal(device){
 // a class to make event, takes member device day starting hour/minute and duration
 function createEvent(member, device, day, startHour, startMinute, duration) {
     // makes dates for start and end times
+    console.log(startHour, startMinute)
+    let dayToIndex = {"Monday": 0, "Tuesday": 1, "Wednesday": 2, "Thursday": 3, "Friday": 4, "Saturday": 6, "Sunday": 7}
+    day = dayToIndex[day]
     var dateStartTime = new Date(0, 0, 0, startHour, startMinute);
     var dateEndTime = new Date(dateStartTime.valueOf() + (duration*60*1000))
     // goes through every event in calendar and ensures new event doesn't overlap preexisting events
@@ -66,8 +69,8 @@ function createEvent(member, device, day, startHour, startMinute, duration) {
     // creates new event in device's calendar
     device.calendar[day].push(
         { person: member,
-        startTime: dateStartTime,
-        endTime: dateEndTime,
+        startTime: dateStartTime.valueOf(),
+        endTime: dateEndTime.valueOf(),
         }
     ) 
     return true;

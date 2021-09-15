@@ -1,8 +1,15 @@
 import * as React from 'react';
 import { Text, Button, List, } from 'react-native-paper';
-import {ScrollView} from 'react-native';
+import {ScrollView, StyleSheet} from 'react-native';
 import Store from '../Store/store.js';
 import Devices from '../Store/devices.js';
+
+
+const scheduleStyle = StyleSheet.create({
+  marginTop: 60,
+  marginLeft: 15,
+  marginRight: 15,
+})
 
 class ScheduleRoute extends React.Component {
     constructor(props) {
@@ -22,11 +29,16 @@ class ScheduleRoute extends React.Component {
       this.selectAmPm = this.selectAmPm.bind(this);
       this.selectDuration = this.selectDuration.bind(this);
       this.onSchedule = this.onSchedule.bind(this);
-  
-      Store.subscribe(() => {
+    }
+
+    componentDidMount(){
+      this.unsubscribe = Store.subscribe(() => {
         this.setState({devices: Store.getState().devices.devices, members: Store.getState().members.members})
       })
-  
+    }
+
+    componentWillUnmount(){
+      this.unsubscribe();
     }
       /*
       1. Create a function called schedule Device
@@ -296,7 +308,7 @@ class ScheduleRoute extends React.Component {
   
       
   
-      return <ScrollView>
+      return <ScrollView style={scheduleStyle}>
         <Text> Input details to schedule a new event </Text>
         <ChooseMemAcc onMemberSelect={this.selectMember}/>
         <ChooseDevAcc onDeviceSelect={this.selectDevice}/>

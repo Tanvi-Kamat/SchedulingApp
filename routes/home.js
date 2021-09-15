@@ -1,26 +1,39 @@
 import * as React from 'react';
 import { Subheading, Title, TextInput, Paragraph, Button, Headline, Provider, Portal, Modal, Card, Avatar, DataTable } from 'react-native-paper';
-import { View } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import Store from '../Store/store.js';
 
+const homeStyle = StyleSheet.create({
+  marginTop: 60,
+  marginLeft: 5,
+  marginRight: 5
+})
 
 class HomeRoute extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
-        familyName: "potter",
+        familyName: "",
         devices: Store.getState().devices.devices,
         members: Store.getState().members.members,
         modalVisible: false,
         modalDay: 0
       }
-      Store.subscribe(() => {
-        this.setState({devices: Store.getState().devices.devices, members: Store.getState().members.members})
-      })
+      
   
       this.setFamilyName = this.setFamilyName.bind(this);
       this.setVisible = this.setVisible.bind(this);
       this.setDay = this.setDay.bind(this);
+    }
+
+    componentDidMount(){
+      this.unsubscribe = Store.subscribe(() => {
+        this.setState({devices: Store.getState().devices.devices, members: Store.getState().members.members})
+      })
+    }
+
+    componentWillUnmount(){
+      this.unsubscribe();
     }
   
     setFamilyName(text){
@@ -86,7 +99,7 @@ class HomeRoute extends React.Component {
         const LeftContent = props => <Avatar.Icon {...props} icon="folder" />
         const devices = Object.values(this.state.devices);
         let event = []
-        // I want you to loop thru all devices, get the day (props.day), get the events that happen for that day for that device
+        
         for(let i = 0; i < devices.length; i++) {
           console.log("--- SCHEDULE ---")
           let deviceEvents = (devices[i].calendar[props.day])
@@ -102,11 +115,13 @@ class HomeRoute extends React.Component {
         let schedule = event.map(data => {
           const device = data[0]
           const event = data[1]
+          const options = {hour: '2-digit', minute: '2-digit', hour12: true}
 
+          const startTimeString = (new Date(event.startTime).toLocaleTimeString('en-US', options))
           return <DataTable.Row>
           <DataTable.Cell>{this.state.members[event.person].name}</DataTable.Cell>
           <DataTable.Cell >{device.name}</DataTable.Cell>
-          <DataTable.Cell numeric>6.0</DataTable.Cell>
+          <DataTable.Cell numeric>{startTimeString} - {(new Date(event.endTime).toLocaleTimeString('en-US', options))}</DataTable.Cell>
         </DataTable.Row>
 
         })
@@ -117,13 +132,11 @@ class HomeRoute extends React.Component {
               <DataTable.Header>
                 <DataTable.Title>Member</DataTable.Title>
                 <DataTable.Title >Device</DataTable.Title>
-                <DataTable.Title numeric>Time Slots</DataTable.Title>
+                <DataTable.Title numeric>Time</DataTable.Title>
               </DataTable.Header>
+              
               {schedule}
               
-        
-              
-        
             </DataTable>
           );
         }
@@ -159,38 +172,34 @@ class HomeRoute extends React.Component {
       
           const showModal = () => this.setVisible(true);
           const hideModal = () => this.setVisible(false);
-          return <View>
-              <Provider>
+          return <View style={homeStyle}>
               
-                <Headline>Welcome back to the Scheduling App, { this.state.familyName }!</Headline>
-                  <Title> Here is this week's schedule. Click on a day to expand. </Title>
-                  <DayModal visibility={this.state.modalVisible} onDismiss={hideModal} day={this.state.modalDay}/>
-                  <MondayButton onPress={showModal} setDay={() => {this.setDay(0)}}/>
-                  <TuesdayButton onPress={showModal} setDay={() => {this.setDay(1)}}/>
-                  <WednesdayButton onPress={showModal} setDay={() => {this.setDay(2)}}/>
-                  <ThursdayButton onPress={showModal} setDay={() => {this.setDay(3)}}/>
-                  <FridayButton onPress={showModal} setDay={() => {this.setDay(4)}}/>
-                  <SaturdayButton onPress={showModal} setDay={() => {this.setDay(5)}}/>
-                  <SundayButton onPress={showModal} setDay={() => {this.setDay(6)}}/>
+            <Headline>Welcome back to the Scheduling App, { this.state.familyName }!</Headline>
+              <Title> Here is this week's schedule. Click on a day to expand. </Title>
+              <DayModal visibility={this.state.modalVisible} onDismiss={hideModal} day={this.state.modalDay}/>
+              <MondayButton onPress={showModal} setDay={() => {this.setDay(0)}}/>
+              <TuesdayButton onPress={showModal} setDay={() => {this.setDay(1)}}/>
+              <WednesdayButton onPress={showModal} setDay={() => {this.setDay(2)}}/>
+              <ThursdayButton onPress={showModal} setDay={() => {this.setDay(3)}}/>
+              <FridayButton onPress={showModal} setDay={() => {this.setDay(4)}}/>
+              <SaturdayButton onPress={showModal} setDay={() => {this.setDay(5)}}/>
+              <SundayButton onPress={showModal} setDay={() => {this.setDay(6)}}/>
                 
-              </Provider>
           </View>
       }
   
-      return <View>
+      return <View style={homeStyle}>
           <Provider>
-        <Title> Welcome to the Scheduling App! </Title>
+        <Headline> Welcome to the Scheduling App! </Headline>
         <TextInput
             label="Family Name"
             value={this.state.familyName}
             onChangeText={text => this.setFamilyName(text)}
         />
-        <Subheading>How to use the Scheduling App: </Subheading>
         <Paragraph>
           Enter your family name into the box above
         </Paragraph>
-        <ScheduleButton/>
-        <MyModal/>
+
         </Provider>
       </View>
     }

@@ -1,8 +1,15 @@
 import * as React from 'react';
 import { TextInput, Button, Portal, Dialog, Avatar, Headline, List, DataTable, } from 'react-native-paper';
-import { View } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import Store from '../Store/store.js';
 import Member from '../Store/member.js';
+
+
+const peopleStyle = StyleSheet.create({
+  marginTop: 60,
+  marginLeft: 5,
+  marginRight: 5
+})
 
 class PeopleRoute extends React.Component {
     constructor(props) {
@@ -19,10 +26,14 @@ class PeopleRoute extends React.Component {
       this.setState({peoples: Store.getState().members.members})
   
       let that = this;
-      Store.subscribe(function() {
+      this.unsubscribe = Store.subscribe(function() {
         let state = Store.getState().members.members;
         that.setState({peoples: state});
       })
+    }
+
+    componentWillUnmount(){
+      this.unsubscribe();
     }
   
     addMember() {
@@ -50,17 +61,17 @@ class PeopleRoute extends React.Component {
       const MyDTable = () => (
         <DataTable>
           <DataTable.Header>
-            <DataTable.Title>Device Name</DataTable.Title>
+            <DataTable.Title>Device</DataTable.Title>
             <DataTable.Title numeric>Time</DataTable.Title>
           </DataTable.Header>
       
           <DataTable.Row>
-            <DataTable.Cell>Mac</DataTable.Cell>
+            <DataTable.Cell>MacExample</DataTable.Cell>
             <DataTable.Cell numeric>4pm-5pm</DataTable.Cell>
           </DataTable.Row>
       
           <DataTable.Row>
-            <DataTable.Cell>Phone</DataTable.Cell>
+            <DataTable.Cell>PhoneExample</DataTable.Cell>
             <DataTable.Cell numeric>9am-11am</DataTable.Cell>
           </DataTable.Row>
       
@@ -89,7 +100,7 @@ class PeopleRoute extends React.Component {
         return <MemberAccordian key={personID} name={this.state.peoples[personID].name}/>
       })
   
-      return <View>
+      return <View style={peopleStyle}>
         <Button icon="account-plus" mode="contained" onPress={() => { this.addMember() }}>
           Add a person to your family
       </Button>

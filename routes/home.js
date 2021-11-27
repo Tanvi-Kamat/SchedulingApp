@@ -1,13 +1,18 @@
 import * as React from 'react';
-import { Subheading, Title, TextInput, Paragraph, Button, Headline, Provider, Portal, Modal, Card, Avatar, DataTable } from 'react-native-paper';
+import { Title, TextInput, Paragraph, Button, Headline, Portal, Modal, Card, Avatar, DataTable } from 'react-native-paper';
 import { View, StyleSheet } from 'react-native';
 import Store from '../Store/store.js';
+import i18n from 'i18n-js';
 
-const homeStyle = StyleSheet.create({
-  marginTop: 60,
+const homeStyle = {
+  marginTop: 10,
   marginLeft: 5,
-  marginRight: 5
-})
+  marginRight: 5,
+  justifyContent: "center",
+  padding: 10,
+  flexDirection: "column",
+  flex:1,
+}
 
 class HomeRoute extends React.Component {
     constructor(props) {
@@ -50,43 +55,43 @@ class HomeRoute extends React.Component {
   
     render() {
       const MondayButton = (props) => (
-        <Button icon="camera" mode="contained" onPress={() => {props.onPress(); props.setDay()}}>
+        <Button icon="calendar-today" mode="contained" onPress={() => {props.onPress(); props.setDay()}}>
           Monday
         </Button>
       );
   
       const TuesdayButton = (props) => (
-        <Button icon="camera" mode="contained" onPress={() => {props.onPress(); props.setDay()}}>
+        <Button icon="calendar-today" mode="contained" onPress={() => {props.onPress(); props.setDay()}}>
           Tuesday
         </Button>
       );
   
       const WednesdayButton = (props) => (
-        <Button icon="camera" mode="contained" onPress={() => {props.onPress(); props.setDay()}}>
+        <Button icon="calendar-today" mode="contained" onPress={() => {props.onPress(); props.setDay()}}>
           Wednesday
         </Button>
       );
   
       const ThursdayButton = (props) => (
-        <Button icon="camera" mode="contained" onPress={() => {props.onPress(); props.setDay()}}>
+        <Button icon="calendar-today" mode="contained" onPress={() => {props.onPress(); props.setDay()}}>
           Thursday
         </Button>
       );
   
       const FridayButton = (props) => (
-        <Button icon="camera" mode="contained" onPress={() => {props.onPress(); props.setDay()}}>
+        <Button icon="calendar-today" mode="contained" onPress={() => {props.onPress(); props.setDay()}}>
           Friday
         </Button>
       );
   
       const SaturdayButton = (props) => (
-        <Button icon="camera" mode="contained" onPress={() => {props.onPress(); props.setDay()}}>
+        <Button icon="calendar-today" mode="contained" onPress={() => {props.onPress(); props.setDay()}}>
           Saturday
         </Button>
       );
   
       const SundayButton = (props) => (
-        <Button icon="camera" mode="contained" onPress={() => {props.onPress(); props.setDay()}}>
+        <Button icon="calendar-today" mode="contained" onPress={() => {props.onPress(); props.setDay()}}>
           Sunday
         </Button>
       );
@@ -101,27 +106,28 @@ class HomeRoute extends React.Component {
         let event = []
         
         for(let i = 0; i < devices.length; i++) {
-          console.log("--- SCHEDULE ---")
           let deviceEvents = (devices[i].calendar[props.day])
           for(let j = 0; j < deviceEvents.length; j++) {
-      
             event.push([devices[i], deviceEvents[j]]);
-
           }
         }
-        console.log(event);
         
 // Ignore this for now
-        let schedule = event.map(data => {
+        let schedule = event.map((data, index) => {
           const device = data[0]
           const event = data[1]
-          const options = {hour: '2-digit', minute: '2-digit', hour12: true}
+          //const options = {hour: '2-digit', minute: '2-digit', hour12: true}
+          const startEvent = new Date(event.startTime)
+          const endEvent = new Date(event.endTime)
 
-          const startTimeString = (new Date(event.startTime).toLocaleTimeString('en-US', options))
-          return <DataTable.Row>
+          const startTimeString =  (i18n.strftime(startEvent, "%I:%M %P"))
+          const endTimeString = (i18n.strftime(endEvent, "%I:%M %P"))
+
+          return <DataTable.Row key={index}>
           <DataTable.Cell>{this.state.members[event.person].name}</DataTable.Cell>
           <DataTable.Cell >{device.name}</DataTable.Cell>
-          <DataTable.Cell numeric>{startTimeString} - {(new Date(event.endTime).toLocaleTimeString('en-US', options))}</DataTable.Cell>
+          <DataTable.Cell >{startTimeString}</DataTable.Cell>
+          <DataTable.Cell >{endTimeString}</DataTable.Cell>
         </DataTable.Row>
 
         })
@@ -132,7 +138,8 @@ class HomeRoute extends React.Component {
               <DataTable.Header>
                 <DataTable.Title>Member</DataTable.Title>
                 <DataTable.Title >Device</DataTable.Title>
-                <DataTable.Title numeric>Time</DataTable.Title>
+                <DataTable.Title >Start Time</DataTable.Title>
+                <DataTable.Title >End Time</DataTable.Title>
               </DataTable.Header>
               
               {schedule}
@@ -146,10 +153,8 @@ class HomeRoute extends React.Component {
           <Card>
             <Card.Title title="Day's Schedule" subtitle="Subtitle" left={LeftContent} />
             <Card.Content>
-          
               <ScheduleTable/>
             </Card.Content>
-          
             <Card.Actions>
               <Button onPress={props.onDismiss}>Exit</Button>
             </Card.Actions>
@@ -174,8 +179,8 @@ class HomeRoute extends React.Component {
           const hideModal = () => this.setVisible(false);
           return <View style={homeStyle}>
               
-            <Headline>Welcome back to the Scheduling App, { this.state.familyName }!</Headline>
-              <Title> Here is this week's schedule. Click on a day to expand. </Title>
+            <Headline>Welcome back to the Scheduling App, { this.state.familyName } family! Here is this week's schedule!</Headline>
+              <Title> Click on a day to expand. </Title>
               <DayModal visibility={this.state.modalVisible} onDismiss={hideModal} day={this.state.modalDay}/>
               <MondayButton onPress={showModal} setDay={() => {this.setDay(0)}}/>
               <TuesdayButton onPress={showModal} setDay={() => {this.setDay(1)}}/>
@@ -188,19 +193,31 @@ class HomeRoute extends React.Component {
           </View>
       }
   
-      return <View style={homeStyle}>
-          <Provider>
-        <Headline> Welcome to the Scheduling App! </Headline>
-        <TextInput
+      const FamilyNameBox = () => {
+        const [name, setName] = React.useState('');
+      
+        return <View>
+          <TextInput
             label="Family Name"
-            value={this.state.familyName}
-            onChangeText={text => this.setFamilyName(text)}
-        />
-        <Paragraph>
-          Enter your family name into the box above
-        </Paragraph>
+            value={name}
+            onChangeText={text => setName(text)}
+          />
+          <Button onPress={() => this.setFamilyName(name)}> Set Name </Button>
+        </View>
+      };
 
-        </Provider>
+      return <View style={homeStyle}>
+        <Headline> Welcome to the Scheduling App! </Headline>
+        
+        <View style={{flexGrow: 1, flexDirection: "column", justifyContent: "center"}}>
+          <Paragraph>
+            Enter your family name into the box below, and click "Set Name":
+          </Paragraph>
+          <FamilyNameBox/>
+        </View>
+        <View style={{flexGrow: 0, opacity: 0}}>
+          <Headline>s</Headline>
+        </View>
       </View>
     }
   

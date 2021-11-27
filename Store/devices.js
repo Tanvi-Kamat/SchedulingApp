@@ -103,7 +103,8 @@ const deviceReducer = createReducer(DeviceState, (builder) => {
             let startMinute = action.payload.startMinute;
             let duration = action.payload.duration;
             
-            Scheduling.calendar.createEvent(memberId, state.devices[deviceId], day, startHour, startMinute, duration);
+            action.payload.success = Scheduling.calendar.createEvent(memberId, state.devices[deviceId], day, startHour, startMinute, duration);
+            
         })
 })
 // Renaming the actions (like a dictionary) so that it has the payload (the changes themselves) when we export the functions that make the payloads

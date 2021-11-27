@@ -15,7 +15,6 @@ const MyComponent = () => {
     { key: 'people', title: 'People', icon: 'account-supervisor' },
     { key: 'devices', title: 'Devices', icon: 'laptop-mac' },
     { key: 'schedule', title: 'Schedule', icon: 'plus'},
-    { key: 'settings', title: 'Settings', icon: 'cogs' },
   ]);
 
   const renderScene = BottomNavigation.SceneMap({
@@ -23,7 +22,6 @@ const MyComponent = () => {
     people: PeopleRoute,
     devices: DevicesRoute,
     schedule: ScheduleRoute,
-    settings: SettingsRoute,
   });
 
   return (

@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { Text, Button, List, } from 'react-native-paper';
+import { Text, Button, List, Modal, Provider, Portal } from 'react-native-paper';
 import {ScrollView, StyleSheet} from 'react-native';
 import Store from '../Store/store.js';
 import Devices from '../Store/devices.js';
 
 
 const scheduleStyle = StyleSheet.create({
-  marginTop: 60,
+  marginTop: 20,
   marginLeft: 15,
   marginRight: 15,
 })
@@ -19,6 +19,7 @@ class ScheduleRoute extends React.Component {
         members: Store.getState().members.members,
         selectedMember: null,
         selectedDevice: null,
+        error: false
       }
   
       this.selectMember = this.selectMember.bind(this);
@@ -29,6 +30,8 @@ class ScheduleRoute extends React.Component {
       this.selectAmPm = this.selectAmPm.bind(this);
       this.selectDuration = this.selectDuration.bind(this);
       this.onSchedule = this.onSchedule.bind(this);
+      this.showError = this.showError.bind(this);
+      this.hideError = this.hideError.bind(this);
     }
 
     componentDidMount(){
@@ -48,33 +51,25 @@ class ScheduleRoute extends React.Component {
       */
   
     onSchedule() {
-      console.log("Dispatch new calendar event")
-      if(this.state.selectedMember == null) {
-        console.log("1")
+     if(this.state.selectedMember == null) {
         return;
       }
       if(this.state.selectedDevice == null) {
-        console.log("2")
         return;
       }
       if(this.state.selectedDay == null) {
-        console.log("3")
         return;
       }
       if(this.state.selectedHour == null) {
-        console.log("4")
         return;
       }
       if(this.state.selectedMinute == null) {
-        console.log("5")
         return;
       }
       if(this.state.selectedAmPm == null) {
-        console.log("6")
         return;
       }
       if(this.state.selectedDuration == null) {
-        console.log("7")
         return;
       }
       let realHour = this.state.selectedHour;
@@ -82,8 +77,13 @@ class ScheduleRoute extends React.Component {
         realHour = ""+(parseInt(realHour) + 12)
       } 
       let that = this;
-      Store.dispatch(Devices.addEvent(this.state.selectedMember, this.state.selectedDevice, this.state.selectedDay, realHour, this.state.selectedMinute, this.state.selectedDuration));
-      that.setState({selectedMember: null, selectedDevice: null, selectedDay: null, selectedHour: null, selectedMinute: null, selectedAmPm: null, selectedDuration: null})
+      let output = Store.dispatch(Devices.addEvent(this.state.selectedMember, this.state.selectedDevice, this.state.selectedDay, realHour, this.state.selectedMinute, this.state.selectedDuration));
+      
+      if(output.payload.success == true){
+        that.setState({selectedMember: null, selectedDevice: null, selectedDay: null, selectedHour: null, selectedMinute: null, selectedAmPm: null, selectedDuration: null})
+      } else {
+        this.showError();
+      }
       
     }
   
@@ -117,6 +117,12 @@ class ScheduleRoute extends React.Component {
     selectDuration(duration){
       this.setState({selectedDuration: parseInt(duration)})
     }
+    showError(){
+      this.setState({error: true})
+    }
+    hideError(){
+      this.setState({error: false})
+    }
       
     render() {
       const DeviceItem = (props) => (
@@ -132,7 +138,7 @@ class ScheduleRoute extends React.Component {
         const memberitems = Object.keys(members).map(memberId => {
           return <DeviceItem key={memberId} id={memberId} name={this.state.members[memberId].name} onSelect={props.onMemberSelect}/>
         })
-        const [expanded, setExpanded] = React.useState(false);
+        const [expanded, setExpanded] = React.useState(true);
         const handlePress = () => setExpanded(!expanded);
       
         return (
@@ -150,7 +156,6 @@ class ScheduleRoute extends React.Component {
       };
   
       const ChooseDevAcc = (props) => {
-        console.log(Store.getState())
         const devices = Store.getState().devices?.devices;
         
         if(devices == null) devices = [];
@@ -164,7 +169,7 @@ class ScheduleRoute extends React.Component {
           />
         })
   
-        const [expanded, setExpanded] = React.useState(false);
+        const [expanded, setExpanded] = React.useState(true);
       
         const handlePress = () => setExpanded(!expanded);
       
@@ -183,7 +188,7 @@ class ScheduleRoute extends React.Component {
   
       const ChooseDayAcc = (props) => {
   
-        const [expanded, setExpanded] = React.useState(false);
+        const [expanded, setExpanded] = React.useState(true);
       
         const handlePress = () => setExpanded(!expanded);
       
@@ -207,7 +212,7 @@ class ScheduleRoute extends React.Component {
       };
   
       const ChooseHourAcc = (props) => {
-        const [expanded, setExpanded] = React.useState(false);
+        const [expanded, setExpanded] = React.useState(true);
         const handlePress = () => setExpanded(!expanded);
       
         return (
@@ -235,7 +240,7 @@ class ScheduleRoute extends React.Component {
       };
   
       const ChooseMinuteAcc = (props) => {
-        const [expanded, setExpanded] = React.useState(false);
+        const [expanded, setExpanded] = React.useState(true);
         const handlePress = () => setExpanded(!expanded);
       
         return (
@@ -245,6 +250,7 @@ class ScheduleRoute extends React.Component {
               left={props => <List.Icon {...props} icon="calendar-clock" color="blue" />}
               expanded={expanded}
               onPress={handlePress}>
+                <List.Item title="00" onPress={() => props.onMinuteSelect("00")}/>
                 <List.Item title="05" onPress={() => props.onMinuteSelect("05")}/>
                 <List.Item title="10" onPress={() => props.onMinuteSelect("10")}/>
                 <List.Item title="15" onPress={() => props.onMinuteSelect("15")}/>
@@ -256,14 +262,13 @@ class ScheduleRoute extends React.Component {
                 <List.Item title="45" onPress={() => props.onMinuteSelect("45")}/>
                 <List.Item title="50" onPress={() => props.onMinuteSelect("50")}/>
                 <List.Item title="55" onPress={() => props.onMinuteSelect("55")}/>
-                <List.Item title="60" onPress={() => props.onMinuteSelect("60")}/>
             </List.Accordion>
           </List.Section>
         );
       };
   
       const ChooseAmPmAcc = (props) => {
-        const [expanded, setExpanded] = React.useState(false);
+        const [expanded, setExpanded] = React.useState(true);
         const handlePress = () => setExpanded(!expanded);
       
         return (
@@ -281,7 +286,7 @@ class ScheduleRoute extends React.Component {
       };
   
       const ChooseDurationAcc = (props) => {
-        const [expanded, setExpanded] = React.useState(false);
+        const [expanded, setExpanded] = React.useState(true);
         const handlePress = () => setExpanded(!expanded);
       
         return (
@@ -299,6 +304,7 @@ class ScheduleRoute extends React.Component {
                 <List.Item title="30" onPress={() => props.onDurationSelect("30 minutes")}/>
                 <List.Item title="45" onPress={() => props.onDurationSelect("45 minutes")}/>
                 <List.Item title="60" onPress={() => props.onDurationSelect("60 minutes")}/>
+                <List.Item title="75" onPress={() => props.onDurationSelect("75 minutes")}/>
                 <List.Item title="90" onPress={() => props.onDurationSelect("90 minutes")}/>
                 <List.Item title="120" onPress={() => props.onDurationSelect("120 minutes")}/>
             </List.Accordion>
@@ -307,7 +313,22 @@ class ScheduleRoute extends React.Component {
       };
   
       
-  
+      const ErrorModal = () => {
+        const containerStyle = {backgroundColor: 'white', padding: 20};
+      
+        return (
+          <Provider>
+            <Portal>
+              <Modal visible={this.state.error} onDismiss={this.hideError}contentContainerStyle={containerStyle}>
+                <Text>Error: The event you scheduled overlaps with another event. Please try again.</Text>
+                <Button onPress={this.hideError}>OK</Button>
+              </Modal>
+            </Portal>
+            <Button style={{marginTop: 30}}></Button>
+          </Provider>
+        );
+      };
+
       return <ScrollView style={scheduleStyle}>
         <Text> Input details to schedule a new event </Text>
         <ChooseMemAcc onMemberSelect={this.selectMember}/>
@@ -317,10 +338,13 @@ class ScheduleRoute extends React.Component {
         <ChooseMinuteAcc onMinuteSelect={this.selectMinute}/>
         <ChooseAmPmAcc onAmPmSelect={this.selectAmPm}/>
         <ChooseDurationAcc onDurationSelect={this.selectDuration}/>
-        <Text> When you are finished, press the button below to create the new event </Text>
+        <Text>When you are finished, press the button below to create the new event </Text>
         <Button icon="calendar" mode="contained" onPress={() => {console.log("t"); this.onSchedule()}}>
           Schedule a new event
         </Button>
+
+        <ErrorModal/>
+
       </ScrollView>
     }
   }

@@ -49,7 +49,6 @@ function getDeviceCal(device){
 // a class to make event, takes member device day starting hour/minute and duration
 function createEvent(member, device, day, startHour, startMinute, duration) {
     // makes dates for start and end times
-    console.log(startHour, startMinute)
     let dayToIndex = {"Monday": 0, "Tuesday": 1, "Wednesday": 2, "Thursday": 3, "Friday": 4, "Saturday": 6, "Sunday": 7}
     day = dayToIndex[day]
     var dateStartTime = new Date(0, 0, 0, startHour, startMinute);
@@ -58,11 +57,19 @@ function createEvent(member, device, day, startHour, startMinute, duration) {
     for(var i = 0; i < device.calendar[day].length; i++) {
         var ev = device.calendar[day][i];
         // if start is in between an event
-        if(ev.startTime >= dateStartTime && ev.startTime < dateEndTime) {
+        if(ev.startTime >= dateStartTime && ev.startTime <= dateEndTime) {
             return false;
         }
         // if end is in between an event
-        if(ev.endTime >= dateStartTime && ev.endTime < dateEndTime) {
+        if(ev.endTime >= dateStartTime && ev.endTime <= dateEndTime) {
+            return false;
+        }
+        // if start is in between an event
+        if(dateStartTime >= ev.startTime && dateEndTime <= ev.startTime) {
+            return false;
+        }
+        // if end is in between an event
+        if(dateStartTime >= ev.endTime && dateEndTime <= ev.endTime) {
             return false;
         }
     }
@@ -104,18 +111,6 @@ function getSaturday(device) {
 function getSunday(device) {
     return device.calendar[6];
 }
-
-/*function printSchedule(device){
-    var days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-
-    device.calendar.forEach((events, i) => {
-        console.log(days[i]);
-        events.forEach((event, i) => {
-            console.log(members[event.person].name, event.startTime);
-        })
-        console.log("===========================")
-    });
-}*/
 
 // create general structures for members, devices and calendars
 let structure = {

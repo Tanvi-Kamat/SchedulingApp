@@ -1,8 +1,10 @@
 import * as React from 'react';
 import { Title, TextInput, Paragraph, Button, Headline, Portal, Modal, Card, Avatar, DataTable } from 'react-native-paper';
 import { View, StyleSheet } from 'react-native';
-import Store from '../Store/store.js';
+import { Store, persistor } from '../Store/store.js';
+import Member from '../Store/member.js';
 import i18n from 'i18n-js';
+import { PersistGate } from 'redux-persist/integration/react'
 
 const homeStyle = {
   marginTop: 10,
@@ -18,7 +20,7 @@ class HomeRoute extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
-        familyName: "",
+        familyName: Store.getState().members.familyName,
         devices: Store.getState().devices.devices,
         members: Store.getState().members.members,
         modalVisible: false,
@@ -33,7 +35,7 @@ class HomeRoute extends React.Component {
 
     componentDidMount(){
       this.unsubscribe = Store.subscribe(() => {
-        this.setState({devices: Store.getState().devices.devices, members: Store.getState().members.members})
+        this.setState({devices: Store.getState().devices.devices, members: Store.getState().members.members, familyName: Store.getState().members.familyName})
       })
     }
 
@@ -42,7 +44,7 @@ class HomeRoute extends React.Component {
     }
   
     setFamilyName(text){
-      this.setState({familyName: text});
+      Store.dispatch(Member.setFamilyName(text));
     }
 
     setVisible(status){
@@ -207,6 +209,7 @@ class HomeRoute extends React.Component {
       };
 
       return <View style={homeStyle}>
+        <PersistGate persistor={persistor} loading={<Paragraph>Loading...</Paragraph>}>
         <Headline> Welcome to the Scheduling App! </Headline>
         
         <View style={{flexGrow: 1, flexDirection: "column", justifyContent: "center"}}>
@@ -218,6 +221,7 @@ class HomeRoute extends React.Component {
         <View style={{flexGrow: 0, opacity: 0}}>
           <Headline>s</Headline>
         </View>
+        </PersistGate>
       </View>
     }
   

@@ -2,9 +2,8 @@ import * as React from 'react';
 import { TextInput, Button, Portal, Dialog, Avatar, Headline, List, DataTable, Title, } from 'react-native-paper';
 import { View, StyleSheet } from 'react-native';
 import {useSelector} from 'react-redux';
-import Store from '../Store/store.js';
+import {Store} from '../Store/store.js';
 import Member from '../Store/member.js';
-import { Calendar } from 'antd-mobile';
 import i18n from 'i18n-js';
 
 

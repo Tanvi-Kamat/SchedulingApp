@@ -1,10 +1,23 @@
 import MemberStore from './member.js';
 import DeviceStore from './devices.js';
-import { configureStore } from '@reduxjs/toolkit'
-import { combineReducers } from 'redux';
+import { combineReducers, createStore } from 'redux';
+import { persistStore, persistReducer } from 'redux-persist'
+import FSStorage, { CacheDir } from 'redux-persist-fs-storage';
+
+
+const persistConfig = {
+  key: 'root',
+  keyPrefix: 'test', // the redux-persist default is `persist:` which doesn't work with some file systems
+  storage: FSStorage(CacheDir, 'ScheduleAppData'),
+};
 
 const rootReducer = combineReducers({members: MemberStore.reducer, devices: DeviceStore.reducer});
-const Store = configureStore({reducer: rootReducer});
+const persistedReducer = persistReducer(persistConfig, rootReducer)
+const Store = createStore(persistedReducer)
 
-
-export default Store;
+const modules = {
+    Store,
+    persistor: persistStore(Store)
+   
+}
+module.exports = modules;

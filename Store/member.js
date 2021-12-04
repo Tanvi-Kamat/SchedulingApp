@@ -1,11 +1,21 @@
 import { createAction, createReducer, configureStore } from '@reduxjs/toolkit'
+import { set } from 'react-native-reanimated'
 import Scheduling from '../SchedulingApp.js'
 
 
 const addAction = createAction('member/add')
 const deleteAction = createAction('member/delete')
 const updateAction = createAction('member/update')
+const setFamilyNameAction = createAction('member/setFamilyName')
 
+function setFamilyName(name){
+    return {
+        type: setFamilyNameAction.type,
+        payload: {
+            name: name
+        } 
+    }
+}
 // used to add member's name and color
 function actionAdd (name, color) {
     return {
@@ -36,7 +46,7 @@ function actionUpdate (memberId, changeset) {
     }
 }
 
-const MemberState = { latestmemberid: 1, members: {} }
+const MemberState = { familyName: "", latestmemberid: 1, members: {} }
 
 // reducer carries out the 3 actions (add, delete, update)
 const memberReducer = createReducer(MemberState, (builder) => {
@@ -62,6 +72,9 @@ const memberReducer = createReducer(MemberState, (builder) => {
             let memberid = action.payload.id;
             state.members[memberid] = Object.assign(state.members[memberid], action.payload.changeset);
         })
+        .addCase(setFamilyNameAction, (state, action) => {
+            state.familyName = action.payload.name;
+        })
 })
 // Renaming the actions (like a dictionary) so that it has the payload (the changes themselves) when we export the functions that make the payloads
 // This makes the payloads public so that it's easier to use them without having to create additional structures
@@ -69,7 +82,8 @@ const modules = {
     reducer: memberReducer,
     addAction: actionAdd,
     deleteAction: actionDelete,
-    updateAction: actionUpdate
+    updateAction: actionUpdate,
+    setFamilyName: setFamilyName
 }
 
 export default modules

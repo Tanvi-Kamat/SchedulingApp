@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Text, Button, List, Modal, Provider, Portal } from 'react-native-paper';
 import {ScrollView, StyleSheet} from 'react-native';
-import Store from '../Store/store.js';
+import {Store} from '../Store/store.js';
 import Devices from '../Store/devices.js';
 
 
@@ -138,7 +138,7 @@ class ScheduleRoute extends React.Component {
         const memberitems = Object.keys(members).map(memberId => {
           return <DeviceItem key={memberId} id={memberId} name={this.state.members[memberId].name} onSelect={props.onMemberSelect}/>
         })
-        const [expanded, setExpanded] = React.useState(true);
+        const [expanded, setExpanded] = React.useState(false);
         const handlePress = () => setExpanded(!expanded);
       
         return (
@@ -147,7 +147,7 @@ class ScheduleRoute extends React.Component {
             <List.Accordion
               title={this.state.members[this.state.selectedMember] ? this.state.members[this.state.selectedMember].name : "Select a member"}
               left={props => <List.Icon {...props} icon="account" color="blue" />}
-              expanded={expanded}
+              expanded={expanded || !this.state.selectedMember}
               onPress={handlePress}>
                 {memberitems}
             </List.Accordion>
@@ -169,7 +169,7 @@ class ScheduleRoute extends React.Component {
           />
         })
   
-        const [expanded, setExpanded] = React.useState(true);
+        const [expanded, setExpanded] = React.useState(false);
       
         const handlePress = () => setExpanded(!expanded);
       
@@ -178,7 +178,7 @@ class ScheduleRoute extends React.Component {
             <List.Accordion
               title={this.state.devices[this.state.selectedDevice] ? this.state.devices[this.state.selectedDevice].name : "Select a device"}
               left={props => <List.Icon {...props} icon="laptop" color="blue" />}
-              expanded={expanded}
+              expanded={expanded || !this.state.selectedDevice}
               onPress={handlePress}>
                 {deviceitems}
             </List.Accordion>
@@ -188,7 +188,7 @@ class ScheduleRoute extends React.Component {
   
       const ChooseDayAcc = (props) => {
   
-        const [expanded, setExpanded] = React.useState(true);
+        const [expanded, setExpanded] = React.useState(false);
       
         const handlePress = () => setExpanded(!expanded);
       
@@ -197,7 +197,7 @@ class ScheduleRoute extends React.Component {
             <List.Accordion
               title={this.state.selectedDay ? this.state.selectedDay : "Select a day"}
               left={props => <List.Icon {...props} icon="calendar" color="blue"/>}
-              expanded={expanded}
+              expanded={expanded || !this.state.selectedDay}
               onPress={handlePress}>
                 <List.Item title="Monday" onPress={() => props.onDaySelect("Monday")}/>
                 <List.Item title="Tuesday" onPress={() => props.onDaySelect("Tuesday")}/>
@@ -212,7 +212,7 @@ class ScheduleRoute extends React.Component {
       };
   
       const ChooseHourAcc = (props) => {
-        const [expanded, setExpanded] = React.useState(true);
+        const [expanded, setExpanded] = React.useState(false);
         const handlePress = () => setExpanded(!expanded);
       
         return (
@@ -220,7 +220,7 @@ class ScheduleRoute extends React.Component {
             <List.Accordion
               title={this.state.selectedHour ? this.state.selectedHour: "Select the starting hour"}
               left={props => <List.Icon {...props} icon="calendar-clock" color="blue" />}
-              expanded={expanded}
+              expanded={expanded || !this.state.selectedHour}
               onPress={handlePress}>
                 <List.Item title="1" onPress={() => props.onHourSelect("1")}/>
                 <List.Item title="2" onPress={() => props.onHourSelect("2")}/>
@@ -240,7 +240,7 @@ class ScheduleRoute extends React.Component {
       };
   
       const ChooseMinuteAcc = (props) => {
-        const [expanded, setExpanded] = React.useState(true);
+        const [expanded, setExpanded] = React.useState(false);
         const handlePress = () => setExpanded(!expanded);
       
         return (
@@ -248,7 +248,7 @@ class ScheduleRoute extends React.Component {
             <List.Accordion
               title={this.state.selectedMinute ? this.state.selectedMinute : "Select the starting minute"}
               left={props => <List.Icon {...props} icon="calendar-clock" color="blue" />}
-              expanded={expanded}
+              expanded={expanded || !this.state.selectedMinute}
               onPress={handlePress}>
                 <List.Item title="00" onPress={() => props.onMinuteSelect("00")}/>
                 <List.Item title="05" onPress={() => props.onMinuteSelect("05")}/>
@@ -268,7 +268,7 @@ class ScheduleRoute extends React.Component {
       };
   
       const ChooseAmPmAcc = (props) => {
-        const [expanded, setExpanded] = React.useState(true);
+        const [expanded, setExpanded] = React.useState(false);
         const handlePress = () => setExpanded(!expanded);
       
         return (
@@ -276,7 +276,7 @@ class ScheduleRoute extends React.Component {
             <List.Accordion
               title={this.state.selectedAmPm ? this.state.selectedAmPm : "Select AM or PM"}
               left={props => <List.Icon {...props} icon="calendar-clock" color="blue" />}
-              expanded={expanded}
+              expanded={expanded || !this.state.selectedAmPm}
               onPress={handlePress}>
                 <List.Item title="AM" onPress={() => props.onAmPmSelect("AM")}/>
                 <List.Item title="PM" onPress={() => props.onAmPmSelect("PM")}/>
@@ -286,7 +286,7 @@ class ScheduleRoute extends React.Component {
       };
   
       const ChooseDurationAcc = (props) => {
-        const [expanded, setExpanded] = React.useState(true);
+        const [expanded, setExpanded] = React.useState(false);
         const handlePress = () => setExpanded(!expanded);
       
         return (
@@ -294,7 +294,7 @@ class ScheduleRoute extends React.Component {
             <List.Accordion
               title={this.state.selectedDuration ? this.state.selectedDuration : "Select a duration (in minutes)"}
               left={props => <List.Icon {...props} icon="clock-outline" color="blue" />}
-              expanded={expanded}
+              expanded={expanded || !this.state.selectedDuration}
               onPress={handlePress}>
                 <List.Item title="05" onPress={() => props.onDurationSelect("05 minutes")}/>
                 <List.Item title="10" onPress={() => props.onDurationSelect("10 minutes")}/>

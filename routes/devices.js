@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Headline, TextInput, Button, Portal, Dialog, List, DataTable, Title, } from 'react-native-paper';
 import { View, StyleSheet } from 'react-native';
-import Store from '../Store/store.js';
+import {Store} from '../Store/store.js';
 import Devices from '../Store/devices.js';
 import i18n from 'i18n-js';
 
@@ -23,7 +23,7 @@ class DevicesRoute extends React.Component {
         count: 0,
         deviceName: "",
         devices: {},
-        members: Store.getState().members.members
+        members: Store.getState().members.members,
       }
     }
   
@@ -80,7 +80,7 @@ class DevicesRoute extends React.Component {
           const endTimeString = (i18n.strftime(endEvent, "%I:%M %P"))
   
           return <DataTable.Row key={index}>
-          <DataTable.Cell>{this.state.peoples[event.person].name}</DataTable.Cell>
+          <DataTable.Cell>{this.state.members[event.person].name}</DataTable.Cell>
           <DataTable.Cell >{startTimeString}</DataTable.Cell>
           <DataTable.Cell >{endTimeString}</DataTable.Cell>
         </DataTable.Row>
